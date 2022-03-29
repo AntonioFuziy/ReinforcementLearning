@@ -7,9 +7,7 @@ goal_state = [[1,2,3],
               [8,0,4],
               [7,6,5]]
 
-first_test_board = [[1,2,3],
-                    [0,8,4],
-                    [7,6,5]]
+first_test_board = [[8,1,3],[0,7,2],[6,5,4]]
 
 class Puzzle8(State):
   def __init__(self, size, board, operator):
@@ -106,12 +104,6 @@ class Puzzle8(State):
   
   def h(self):
     return self.calculate_manhattan_distance()
-
-  # def generateBoard(self):
-  #   self.board = first_test_board
-    #printing matrix
-    # for i in self.board:
-    #   print(i)
 
 def main():
   print('8 Puzzle Problem')
