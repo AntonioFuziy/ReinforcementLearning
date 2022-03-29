@@ -125,7 +125,7 @@ class AEstrela (SearchAlgorithm):
             #list sorted by f()
             open.sort(key = sortFunction, reverse = True)
             n = open.pop()[0]
-            logging.debug(n.state.env()+" -- "+str(n.f())+" -- "+str(n.h()))
+            # logging.debug(n.state.env()+" -- "+str(n.f())+" -- "+str(n.h()))
 
             if (n.state.is_goal()):
                 return n

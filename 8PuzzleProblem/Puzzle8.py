@@ -1,71 +1,65 @@
 from SearchAlgorithms import AEstrela
 from Graph import State
 import time
+import copy
 
 goal_state = [[1,2,3],
               [8,0,4],
               [7,6,5]]
 
-first_test_board = [[8,1,3],
-                    [0,7,2],
-                    [6,5,4]]
+first_test_board = [[1,2,3],
+                    [0,8,4],
+                    [7,6,5]]
 
 class Puzzle8(State):
   def __init__(self, size, board, operator):
     self.size = size
     self.board = board
     self.operator = operator
-
-  def env(self):
-    return ";" + str(self.operator)
   
   def sucessors(self):
     sucessores = []
     x, y = self.find_empty_position()
     if x > 0:
       #right
-      temp = self.board.copy()
-      temp[y][x] = temp[y][x-1]
-      temp[y][x-1] = 0
-      print("right")
-      sucessores.append(Puzzle8(self.size, temp, "right"))
+      temp1 = copy.deepcopy(self.board)
+      temp1[x][y] = temp1[x-1][y]
+      temp1[x-1][y] = 0
+      sucessores.append(Puzzle8(self.size, temp1, "up"))
     if x < self.size - 1:
       #left
-      temp = self.board.copy()
-      temp[y][x] = temp[y][x+1]
-      temp[y][x+1] = 0
-      print("left")
-      sucessores.append(Puzzle8(self.size, temp, "left"))
+      temp2 = copy.deepcopy(self.board)
+      temp2[x][y] = temp2[x+1][y]
+      temp2[x+1][y] = 0
+      sucessores.append(Puzzle8(self.size, temp2, "down"))
     if y > 0:
       #down
-      temp = self.board.copy()
-      temp[y][x] = temp[y-1][x]
-      temp[y-1][x] = 0
-      print("down")
-      sucessores.append(Puzzle8(self.size, temp, "down"))
+      temp3 = copy.deepcopy(self.board)
+      temp3[x][y] = temp3[x][y-1]
+      temp3[x][y-1] = 0
+      sucessores.append(Puzzle8(self.size, temp3, "left"))
     if y < self.size - 1:
       #up
-      temp = self.board.copy()
-      temp[y][x] = temp[y+1][x]
-      temp[y+1][x] = 0
-      print("up")
-      sucessores.append(Puzzle8(self.size, temp, "up"))
-    for i in range(len(self.board[0])):
+      temp4 = copy.deepcopy(self.board)
+      temp4[x][y] = temp4[x][y+1]
+      temp4[x][y+1] = 0
+      sucessores.append(Puzzle8(self.size, temp4, "right"))
+    for i in range(self.size):
       print(self.board[i])
     print("")
     return sucessores
   
   def find_empty_position(self):
-    for i in range(0, len(self.board[0])):
-      for j in range(0, len(self.board[0])):
+    for i in range(0, self.size):
+      for j in range(0, self.size):
         if self.board[i][j] == 0:
           # print(f"Zero x: {i} y: {j}")
           return i, j
 
   def calculate_manhattan_distance(self):
     distance = 0
-    for i in range(0, len(self.board[0])):
-      for j in range(0, len(self.board[0])):
+    for i in range(0, self.size):
+      for j in range(0, self.size):
         x_goal, y_goal = self.return_goal_position(self.board[i][j]) 
         distance += abs(i-x_goal) + abs(j-y_goal)
     print("Distance: ", distance)
@@ -94,7 +88,7 @@ class Puzzle8(State):
       raise Exception("Matriz errada")
                     
   def is_goal(self):
-    if self.board == goal_state:#self.board[0][0] == 1 and self.board[0][1] == 2 and self.board[0][2] == 3 and self.board[1][2] == 4 and self.board == [2][2] == 5 and self.board[2][1] == 6 and self.board[2][0] == 7 and self.board[0][1] == 8 and self.board[1][1] == 0:
+    if self.board == goal_state:
       return True
     return False
   
@@ -106,20 +100,24 @@ class Puzzle8(State):
 
   def print(self):
     return self.board
+
+  def env(self):
+    return str(self.board)
   
   def h(self):
     return self.calculate_manhattan_distance()
 
-  def generateBoard(self):
-    self.board = first_test_board
+  # def generateBoard(self):
+  #   self.board = first_test_board
     #printing matrix
-    for i in self.board:
-      print(i)
+    # for i in self.board:
+    #   print(i)
 
 def main():
   print('8 Puzzle Problem')
-  state = Puzzle8(size=3, board=None, operator=None)
-  state.generateBoard()
+  board = first_test_board
+  state = Puzzle8(size=3, board=board, operator="")
+  # state.generateBoard()
   algorithm = AEstrela()
   print("Initial state with h = "+str(state.h()))
   start = time.time()
@@ -127,7 +125,7 @@ def main():
   end = time.time()
   if result != None:
     print('Achou!')
-    print(result.env())
+    print(result.show_path())
     print('Final state with h = '+str(result.h()))
     print('Duration in seconds = '+str(end-start))
   else:
