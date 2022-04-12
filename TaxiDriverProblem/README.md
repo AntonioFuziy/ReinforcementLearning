@@ -1,4 +1,4 @@
-# Taxi Driver Problem - Reinforcement Learnin
+# Taxi Driver Problem - Reinforcement Learning
 
 **Aluno: Antonio Fuziy**
 

@@ -1,0 +1,7 @@
+Taxi Driver Problem
+
+Antonio Fuziy
+
+Reinforcement Learning
+
+Para a resolução do problema do taxi, foi necessário implementar uma classe TaxiDriver que instancia a classe State da biblioteca Graph, para inicializar-la utilizou-se alguns parâmetros como operator, representando o movimento realizado pelo taxi ao longo do problema, taxi_position, representando a posição do taxi no momento atual, got_passenger, sendo uma booleana que define se o passageiro está ou não dentro do taxi, passenget_position, representando a posição onde o passageiro se encontra esperando o taxi, goal_location, define a posição do destino, start_position define a posição inicial do taxi, obstacles representa um array de todos os obstáculos dentro do percurso e por fim, size_x e size_y definindo o tamanho do percurso a ser tratado.
