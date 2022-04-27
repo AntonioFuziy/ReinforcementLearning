@@ -1,105 +1,48 @@
-import time
-from SearchAlgorithms import AEstrela
-from Graph import State
+
 import gym
+import numpy as np
+from TaxiDriverHeuristics import TaxiDriverHeuristics
+from SearchAlgorithms import AEstrela
 
-env = gym.make("Taxi-v3").env
-
-positions = {
-  0: 'R',
-  1: 'G',
-  2: 'Y',
-  3: 'B',
-  4: False,
-}
-
-class TaxiDriver(State):
-  def __init__(self, taxi_map, operator, current_state):
+class TaxiDriver():
+  def __init__(self, current_state, positions):
     self.current_state = current_state
-    self.taxi_row, self.taxi_col, self.pass_idx, self.dest_idx = self.current_state
-    self.taxi_map = taxi_map
-    self.operator = operator
-    self.taxi_position = (self.taxi_row, self.taxi_col)
+    self.positions = list(positions)
 
-  def env(self):
-    return ";" + str(self.operator) + ";" + str(self.taxi_position) + ";" + str(self.got_passenger) + ";" + str(self.passenger_position)
-
-  def sucessors(self):
-    sucessors = []
-
-    up = (self.taxi_position[0] - 1, self.taxi_position[1])
-    down = (self.taxi_position[0] + 1, self.taxi_position[1])
-    left = (self.taxi_position[0], self.taxi_position[1] - 1)
-    right = (self.taxi_position[0], self.taxi_position[1] + 1)
+    self.possible_destinations = {
+      0: [1,1],
+      1: [1,9],
+      2: [5,1],
+      3: [5,7]
+    }
     
-    if self.can_move_taxi(up, "up") and (up[0] >= 0):
-      sucessors.append(TaxiDriver("UP", up))
-    if self.can_move_taxi(down, "down") and (down[0] < len(self.map)-1):
-      sucessors.append(TaxiDriver("DOWN", down))
-    if self.can_move_taxi(right, "right") and (right[1] < len(self.map)-1):
-      sucessors.append(TaxiDriver("RIGHT", right))
-    if self.can_move_taxi(left, "left") and (left[1] >= 0):
-      sucessors.append(TaxiDriver("LEFT", left))
-    
-    if self.can_get_passenger():
-      sucessors.append(TaxiDriver("GET PASSENGER", self.taxi_position, True, self.passenger_position, self.goal_location, self.start_position, self.obstacles, self.size_x, self.size_y))
-    
-    return sucessors
 
-  def is_goal(self):
-    if self.dest_idx == self.pass_idx:
-      return True
-    return False
 
-  def cost(self):
-    return 1
+  def solve(self):
+    goal_location = self.possible_destinations[self.positions[3]]
+    start_position = [self.positions[0]+1 , self.positions[1]*2+1]
+    print(start_position)
+    passenger_position = self.possible_destinations[self.positions[2]]
+    obstacles = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [1, 0], [1, 4], [1, 10], [2, 0], [2, 4], [2, 10], [3, 0], [3, 10], [4, 0], [4, 2], [4, 6], [4, 10], [5, 0], [5, 2], [5, 6], [5, 10], [6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7], [6, 8], [6, 9], [6, 10]]
+    state = TaxiDriverHeuristics(operator="", taxi_position=start_position, got_passenger=False, passenger_position=passenger_position, goal_location=goal_location, obstacles=obstacles)
+    algorithm = AEstrela()
+    result = algorithm.search(state)
+    return result
 
-  def h(self):
-    if self.map[self.pass_idx] != None:
-      return abs(self.taxi_position[0]-self.goal_location[0]) + abs(self.taxi_position[1]-self.goal_location[1])
-
-    return abs(self.taxi_position[0]-self.passenger_position[0]) + abs(self.taxi_position[1]-self.passenger_position[1])
-
-  def can_get_passenger(self):
-    if (self.taxi_position == self.passenger_position) and (not self.got_passenger):
-      return True
-    return False
-
-  def can_move_taxi(self, next_position, direction):
-    if self.taxi_map[next_position[0]][next_position[1]] != '|' and (direction == "left" or direction == "right"):
-      return False
-    if self.taxi_map[next_position[0]][next_position[1]] != '-' and (direction == "up" or direction == "down"):
-      return False
-    return True
-
-  def description(self):
-    return "Taxi Driver Problem"
-
-  def print(self):
-    return self.operator
+  def path(self):
+    instructions = self.solve().show_path().replace(" ", "").replace(";", " ").split()
+    for i in range(0, len(instructions)):
+      instructions[i] = int(instructions[i])
+    instructions.append(5)
+    print(instructions)
+    return instructions
 
 def main():
-  print("Taxi Driver Problem")
+  env = gym.make("Taxi-v3").env
   state = env.reset()
-  env.render()
-  taxi_row, taxi_col, pass_idx, dest_idx = env.decode(state)
-  print(taxi_row, taxi_col, pass_idx, dest_idx)
-  goal_location = (9,5)
-  start_position = (taxi_row, taxi_col)
-  passenger_position = (3,3)
-  # obstacles = [(1,0),(1,1),(1,3),(1,4)]
-  state = TaxiDriver(operator="", taxi_position=start_position, got_passenger=False, passenger_position=passenger_position, goal_location=goal_location, start_position=start_position, state=state)
-  algorithm = AEstrela()
-  start = time.time()
-  result = algorithm.search(state)
-  end = time.time()
-  if result:
-    print("Achou!")
-    print(result.show_path())
-    env.render()
-    print('Duration in seconds = ' + str(end-start))
-  else:
-    print("Não achou solucao")
+  # new_map = env.desc
+  result = TaxiDriver(env.desc, env.decode(state))
+  print(result.path())
 
 if __name__ == '__main__':
   main()
