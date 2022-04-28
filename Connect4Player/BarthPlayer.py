@@ -49,7 +49,7 @@ class BarthPlayer(Player):
 
 
     def move(self, player_code, board):
-        _, action = self.max_value(board, None, -999999, 999999, player_code, 5)
+        _, action = self.max_value(board, None, -999999, 999999, player_code, 6)
         #
         # Poderiamos fazer soh o 
         #

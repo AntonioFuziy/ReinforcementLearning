@@ -7,7 +7,7 @@ class FuziyPlayer(Player):
 
   def max_value(self, board, action, alpha, beta, player_code, p):
     if p == 0:
-      result = self.eval(player_code, board), action
+      result = self.evaluate(player_code, board), action
       return result
     sucessors = self.sucessores(player_code, board)
     for s in sucessors:
@@ -21,7 +21,7 @@ class FuziyPlayer(Player):
   
   def min_value(self, board, action, alpha, beta, player_code, p):
     if p == 0:
-      result = self.eval(player_code, board), action
+      result = self.evaluate(player_code, board), action
       return result
     sucessors = self.sucessores(player_code, board)
     for s in sucessors:
@@ -39,7 +39,7 @@ class FuziyPlayer(Player):
     if (self.emergency(board, player_code)):
       sucessores = self.sucessores(self.enemy(player_code), board)
       for s in sucessores:
-        result = self.eval(self.enemy(player_code), s['board'])
+        result = self.evaluate(self.enemy(player_code), s['board'])
         if (result > 70000):
           print("EMERGENCY")
           return None, s['action']
@@ -70,7 +70,7 @@ class FuziyPlayer(Player):
     else:
       return 1
 
-  def eval(self, player, board): 
+  def evaluate(self, player, board): 
     lines = self.count_row_line(player, board)
     cols = self.count_row_column(player, board)
     diags = self.count_row_diag(player, board)
@@ -111,7 +111,7 @@ class FuziyPlayer(Player):
   
   def count_row_column(self, player, board):
     retorno = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0}
-    for i in range(6):
+    for i in range(7):
       counter = 0
       for j in range(5):
         if ((board[j, i] == player) and (board[j,i] == board[j+1,i])):
@@ -163,13 +163,13 @@ class FuziyPlayer(Player):
   
   def next_move(self, player, board):
     next_position = 0
+
+    #horizontal
     for i in range(6):
-      # counter = 0
       stay = 0
       for j in range(6):
         if i == 5:
           if j == 3:
-            #left
             if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i, j] == player)):
               stay += 1
               next_position = j-1
@@ -178,7 +178,6 @@ class FuziyPlayer(Player):
               stay += 1
               next_position = j-2
               return True, next_position
-            #right
             if ((board[i, j+3] == player) and (board[i, j+2] == player) and (board[i, j+1] == 0) and (board[i, j] == player)):
               stay += 1
               next_position = j+1
@@ -189,7 +188,6 @@ class FuziyPlayer(Player):
               return True, next_position
           
           if j == 4: 
-            #left
             if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i, j] == player)):
               stay += 1
               next_position = j-1
@@ -204,7 +202,6 @@ class FuziyPlayer(Player):
               return True, next_position
 
           if j >= 5:
-            #left
             if ((board[i, j-1] == 0) and (board[i, j-2] == player) and (board[i, j-3] == player) and (board[i, j] == player)):
               stay += 1
               next_position = j-1
@@ -213,25 +210,8 @@ class FuziyPlayer(Player):
               stay += 1
               next_position = j-2
               return True, next_position
-            #right
-            # if ((board[i, j+1] == enemy) and (board[i, j] == enemy) and (board[i, j-1] == 0) and (board[i, j-2] == enemy)):
-            #   stay += 1
-            #   defence_position = j-1
-            #   return True, defence_position
-            # if ((board[i, j+1] == enemy) and (board[i, j] == 0) and (board[i, j-1] == enemy) and (board[i, j-2] == enemy)):
-            #   stay += 1
-            #   defence_position = j
-            #   return True, defence_position
-          
-          # else:
-          #   stay = 0
-          
-          # if stay >= 1:
-          #   print("defence position: ", defence_position)
-          #   return True, defence_position
         else:
           if j == 3:
-            #left
             if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i+1, j-1] != 0) and (board[i, j] == player)):
               stay += 1
               next_position = j-1
@@ -240,7 +220,6 @@ class FuziyPlayer(Player):
               stay += 1
               next_position = j-2
               return True, next_position
-            #right
             if ((board[i, j+3] == player) and (board[i, j+2] == player) and (board[i, j+1] == 0) and (board[i+1, j+1] != 0) and (board[i, j] == player)):
               stay += 1
               next_position = j+1
@@ -251,7 +230,6 @@ class FuziyPlayer(Player):
               return True, next_position
           
           if j == 4: 
-            #left
             if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i+1, j-1] != 0) and (board[i, j] == player)):
               stay += 1
               next_position = j-1
@@ -266,7 +244,6 @@ class FuziyPlayer(Player):
               return True, next_position
 
           if j >= 5:
-            #left
             if ((board[i, j-1] == 0) and (board[i+1, j-1] != 0) and (board[i, j-2] == player) and (board[i, j-3] == player) and (board[i, j] == player)):
               stay += 1
               next_position = j-1
@@ -274,6 +251,20 @@ class FuziyPlayer(Player):
             if ((board[i, j-1] == player) and (board[i, j-2] == 0) and (board[i+1, j-2] != 0) and (board[i, j-3] == player) and (board[i, j] == player)):
               stay += 1
               next_position = j-2
+              return True, next_position
+    
+    #vertical
+    for i in range(7):
+      end = 0
+      for j in range(5):
+        if ((board[j, i] == player) and (board[j+1,i] == player)):
+          end += 1
+        else:
+          end = 0
+        if (end >= 2):
+          if j >= 2:
+            if board[j-2,i] == 0:
+              next_position = i
               return True, next_position
               
     return False, next_position
