@@ -33,25 +33,27 @@ class FuziyPlayer(Player):
         return beta, action 
     return beta, action
 
-  def isThereAnyEmergency(self, board, player_code):
-    enemy = self.enemy(player_code)
-    enemy_lines = self.count_row_line(enemy, board)
-    enemy_cols = self.count_row_column(enemy, board)
-    enemy_digs = self.count_row_diag(enemy, board)
-    enemy_digs2 = self.count_row_diag(enemy, board[::-1])
-    if (enemy_cols['3'] > 0 or enemy_lines['3'] > 0 or enemy_digs['3'] > 0 or enemy_digs2['3']> 0):
-      return True
-    return False
-
-
   def move(self, player_code, board):
     _, action = self.max_value(board, None, -999999, 999999, player_code, 5)
-    if (self.isThereAnyEmergency(board, player_code)):
+    
+    if (self.emergency(board, player_code)):
       sucessores = self.sucessores(self.enemy(player_code), board)
       for s in sucessores:
         result = self.eval(self.enemy(player_code), s['board'])
-        if (result > 50000):
+        if (result > 70000):
+          print("EMERGENCY")
           return None, s['action']
+
+    near_lost, defence_position = self.next_move(self.enemy(player_code), board)
+    if near_lost:
+      print("BLOQUEIO APENAS")
+      return None, defence_position
+      
+    near_win, win_position = self.next_move(player_code, board)
+    if near_win:
+      print("VITORIA APENAS")
+      return None, win_position
+
     return None, action
 
   def sucessores(self, player_code, board):
@@ -73,24 +75,20 @@ class FuziyPlayer(Player):
     cols = self.count_row_column(player, board)
     diags = self.count_row_diag(player, board)
     diags2 = self.count_row_diag(player, board[::-1])
-    # last_lines = self.count_row_diag(player, board)
-    # print("last_line : ", last_lines)
     possible_path = lines['2'] + cols['2'] + diags['2'] + diags2['2']
     near_to_win = lines['3'] + cols['3'] + diags['3'] + diags2['3']
     almost_win = lines['4'] + cols['4'] + diags['4'] + diags2['4']
-    win = 100000*almost_win + 1000*near_to_win + 10*possible_path
+    win = 100000*almost_win + 1000*near_to_win + possible_path
 
     enemy = self.enemy(player)
     enemy_lines = self.count_row_line(enemy, board)
     enemy_cols = self.count_row_column(enemy, board)
     enemy_digs = self.count_row_diag(enemy, board)
     enemy_digs2 = self.count_row_diag(enemy, board[::-1])
-    # enemy_last_lines = self.count_row_diag(player, board)
-    # print("enemy_last_line: ", enemy_last_lines)
     possible_path_lost = enemy_lines['2'] + enemy_cols['2'] + enemy_digs['2'] + enemy_digs2['2']
     near_to_lost = enemy_lines['3'] + enemy_cols['3'] + enemy_digs['3'] + enemy_digs2['3']
     almost_lost = enemy_lines['4'] + enemy_cols['4'] + enemy_digs['4'] + enemy_digs2['4']
-    lost = 100000*almost_lost + 1000*near_to_lost + 10*possible_path_lost
+    lost = 100000*almost_lost + 1000*near_to_lost + possible_path_lost
     
     return (win - lost)
 
@@ -152,6 +150,133 @@ class FuziyPlayer(Player):
       if (board[5, i] == player):
         counter = counter + 1
     return counter
+
+  def emergency(self, board, player_code):
+    enemy = self.enemy(player_code)
+    enemy_lines = self.count_row_line(enemy, board)
+    enemy_cols = self.count_row_column(enemy, board)
+    enemy_digs = self.count_row_diag(enemy, board)
+    enemy_digs2 = self.count_row_diag(enemy, board[::-1])
+    if (enemy_cols['3'] > 0 or enemy_lines['3'] > 0 or enemy_digs['3'] > 0 or enemy_digs2['3']> 0):
+      return True
+    return False
+  
+  def next_move(self, player, board):
+    next_position = 0
+    for i in range(6):
+      # counter = 0
+      stay = 0
+      for j in range(6):
+        if i == 5:
+          if j == 3:
+            #left
+            if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-1
+              return True, next_position
+            if ((board[i, j-3] == player) and (board[i, j-2] == 0) and (board[i, j-1] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-2
+              return True, next_position
+            #right
+            if ((board[i, j+3] == player) and (board[i, j+2] == player) and (board[i, j+1] == 0) and (board[i, j] == player)):
+              stay += 1
+              next_position = j+1
+              return True, next_position
+            if ((board[i, j+3] == player) and (board[i, j+2] == 0) and (board[i, j+1] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j+2
+              return True, next_position
+          
+          if j == 4: 
+            #left
+            if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-1
+              return True, next_position
+            if ((board[i, j-3] == player) and (board[i, j-2] == 0) and (board[i, j-1] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-2
+              return True, next_position
+            if ((board[i, j+2] == player) and (board[i, j+1] == 0) and (board[i, j] == player) and (board[i, j-1] == player)):
+              stay += 1
+              next_position = j+1
+              return True, next_position
+
+          if j >= 5:
+            #left
+            if ((board[i, j-1] == 0) and (board[i, j-2] == player) and (board[i, j-3] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-1
+              return True, next_position
+            if ((board[i, j-1] == player) and (board[i, j-2] == 0) and (board[i, j-3] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-2
+              return True, next_position
+            #right
+            # if ((board[i, j+1] == enemy) and (board[i, j] == enemy) and (board[i, j-1] == 0) and (board[i, j-2] == enemy)):
+            #   stay += 1
+            #   defence_position = j-1
+            #   return True, defence_position
+            # if ((board[i, j+1] == enemy) and (board[i, j] == 0) and (board[i, j-1] == enemy) and (board[i, j-2] == enemy)):
+            #   stay += 1
+            #   defence_position = j
+            #   return True, defence_position
+          
+          # else:
+          #   stay = 0
+          
+          # if stay >= 1:
+          #   print("defence position: ", defence_position)
+          #   return True, defence_position
+        else:
+          if j == 3:
+            #left
+            if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i+1, j-1] != 0) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-1
+              return True, next_position
+            if ((board[i, j-3] == player) and (board[i, j-2] == 0) and (board[i+1, j-2] != 0) and (board[i, j-1] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-2
+              return True, next_position
+            #right
+            if ((board[i, j+3] == player) and (board[i, j+2] == player) and (board[i, j+1] == 0) and (board[i+1, j+1] != 0) and (board[i, j] == player)):
+              stay += 1
+              next_position = j+1
+              return True, next_position
+            if ((board[i, j+3] == player) and (board[i, j+2] == 0) and (board[i+1, j+2] != 0) and (board[i, j+1] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j+2
+              return True, next_position
+          
+          if j == 4: 
+            #left
+            if ((board[i, j-3] == player) and (board[i, j-2] == player) and (board[i, j-1] == 0) and (board[i+1, j-1] != 0) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-1
+              return True, next_position
+            if ((board[i, j-3] == player) and (board[i, j-2] == 0) and (board[i+1, j-2] != 0) and (board[i, j-1] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-2
+              return True, next_position
+            if ((board[i, j+2] == player) and (board[i, j+1] == 0) and (board[i+1, j+1] != 0) and (board[i, j] == player) and (board[i, j-1] == player)):
+              stay += 1
+              next_position = j+1
+              return True, next_position
+
+          if j >= 5:
+            #left
+            if ((board[i, j-1] == 0) and (board[i+1, j-1] != 0) and (board[i, j-2] == player) and (board[i, j-3] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-1
+              return True, next_position
+            if ((board[i, j-1] == player) and (board[i, j-2] == 0) and (board[i+1, j-2] != 0) and (board[i, j-3] == player) and (board[i, j] == player)):
+              stay += 1
+              next_position = j-2
+              return True, next_position
+              
+    return False, next_position
   
   def movement(self, player, board, column):
     result_board = np.matrix(board)
