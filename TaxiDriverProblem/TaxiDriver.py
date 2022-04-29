@@ -1,7 +1,3 @@
-
-import gym
-import numpy as np
-from TaxiDriverHeuristics import TaxiDriverHeuristics
 from SearchAlgorithms import AEstrela
 from TaxiDriverOtimization import TaxiDriverOtimization
 
@@ -31,15 +27,4 @@ class TaxiDriver():
     for i in range(0, len(instructions)):
       instructions[i] = int(instructions[i])
     instructions.append(5)
-    print(instructions)
     return instructions
-
-def main():
-  env = gym.make("Taxi-v3").env
-  state = env.reset()
-  # new_map = env.desc
-  result = TaxiDriver(env.desc, env.decode(state))
-  print(result.path())
-
-if __name__ == '__main__':
-  main()

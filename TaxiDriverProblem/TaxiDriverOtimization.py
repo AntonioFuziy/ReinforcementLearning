@@ -1,5 +1,4 @@
 from Graph import State
-from SearchAlgorithms import AEstrela
 
 class TaxiDriverOtimization(State):
   def __init__(self, taxi_position, passenger_position, got_passenger, operator, goal_location):
