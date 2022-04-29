@@ -53,6 +53,13 @@ class FuziyPlayer(Player):
     if near_win:
       print("VITORIA APENAS")
       return None, win_position
+    
+    if (action is None):
+      for i in range(6):
+        for j in range(6):
+          if (board[i,j] == 0):
+            return None, j
+      
 
     return None, action
 

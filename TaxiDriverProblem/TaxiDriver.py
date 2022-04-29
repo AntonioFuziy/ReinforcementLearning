@@ -3,6 +3,7 @@ import gym
 import numpy as np
 from TaxiDriverHeuristics import TaxiDriverHeuristics
 from SearchAlgorithms import AEstrela
+from TaxiDriverOtimization import TaxiDriverOtimization
 
 class TaxiDriver():
   def __init__(self, current_state, positions):
@@ -16,15 +17,11 @@ class TaxiDriver():
       3: [5,7]
     }
     
-
-
   def solve(self):
     goal_location = self.possible_destinations[self.positions[3]]
     start_position = [self.positions[0]+1 , self.positions[1]*2+1]
-    print(start_position)
     passenger_position = self.possible_destinations[self.positions[2]]
-    obstacles = [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [0, 10], [1, 0], [1, 4], [1, 10], [2, 0], [2, 4], [2, 10], [3, 0], [3, 10], [4, 0], [4, 2], [4, 6], [4, 10], [5, 0], [5, 2], [5, 6], [5, 10], [6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7], [6, 8], [6, 9], [6, 10]]
-    state = TaxiDriverHeuristics(operator="", taxi_position=start_position, got_passenger=False, passenger_position=passenger_position, goal_location=goal_location, obstacles=obstacles)
+    state = TaxiDriverOtimization(start_position, passenger_position, False, '', goal_location)
     algorithm = AEstrela()
     result = algorithm.search(state)
     return result
