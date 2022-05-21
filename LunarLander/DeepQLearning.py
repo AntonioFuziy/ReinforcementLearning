@@ -2,12 +2,6 @@ import numpy as np
 import random
 from keras.activations import relu, linear
 
-#
-# This class implements the Deep Q-Learning algorithm.
-# We can use this implementation to solve LunarLandar-v2 environment from Gym project.
-#
-
-
 class DeepQLearning:
     def __init__(self, env, gamma, epsilon, epsilon_min, epsilon_dec, episodes, batch_size, memory, model):
         self.env = env
