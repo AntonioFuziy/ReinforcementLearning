@@ -9,7 +9,7 @@ done = False
 rewards = 0
 steps = 0
 
-while not done and steps < 300:
+while not done and steps < 3000:
     Q_values = model.predict(state[np.newaxis])
     action = np.argmax(Q_values[0])
     state, reward, done, info = env.step(action)

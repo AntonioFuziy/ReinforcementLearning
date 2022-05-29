@@ -4,7 +4,10 @@ import gym
 
 env = gym.make('LunarLander-v2').env
 state = env.reset()
-model = keras.models.load_model('data/double_DQN_model_lunar_land', compile=False)
+# model = keras.models.load_model('data/double_DQN_model_lunar_land', compile=False)
+model = keras.models.load_model('data/double_DQN_5_model_lunar_land', compile=False)
+# model = keras.models.load_model('data/double_DQN_10_model_lunar_land', compile=False)
+# model = keras.models.load_model('data/double_DQN_15_model_lunar_land', compile=False)
 done = False
 rewards = 0
 steps = 0

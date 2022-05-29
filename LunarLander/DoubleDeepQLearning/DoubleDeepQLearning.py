@@ -7,7 +7,7 @@ from keras.layers import Dense
 import keras
 
 class DoubleDQN:
-  def __init__(self, env, gamma, epsilon, epsilon_min, epsilon_dec, episodes, batch_size, memory):
+  def __init__(self, env, gamma, epsilon, epsilon_min, epsilon_dec, episodes, batch_size, memory, step):
     self.env = env
     self.gamma = gamma
     self.epsilon = epsilon
@@ -16,6 +16,7 @@ class DoubleDQN:
     self.episodes = episodes
     self.batch_size = batch_size
     self.memory = memory
+    self.step = step
     self.primary_network = self.build_network()
     self.target_network = keras.models.clone_model(self.primary_network)
     self.target_network.set_weights(self.primary_network.get_weights())
@@ -49,10 +50,7 @@ class DoubleDQN:
 
       self.primary_network.fit(states, targets_full, epochs=1, verbose=0)
       if self.epsilon > self.epsilon_min:
-          self.epsilon *= self.epsilon_dec
-
-      if self.episodes % 50 == 0 and self.episodes > 0:
-        self.target_network.set_weights(self.primary_network.get_weights())  
+        self.epsilon *= self.epsilon_dec
     
     return
   
@@ -83,6 +81,12 @@ class DoubleDQN:
         if terminal:
           print(f'Episódio: {i+1}/{self.episodes}. Score: {score}')
           break
+      
       rewards.append(score)
-    self.target_network.save('data/double_DQN_model_lunar_land')
+
+      if i % self.step == 0 and i > 0:
+        print("Updating target network...")
+        self.target_network.set_weights(self.primary_network.get_weights())  
+
+    self.target_network.save(f'data/double_DQN_{self.step}_model_lunar_land')
     return rewards
