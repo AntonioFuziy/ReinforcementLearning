@@ -17,3 +17,4 @@ TaxiDriverProblem/__pycache__
 __pycache__
 
 LunarLander/data/
+LunarLander/DoubleDeepQLearning/data
