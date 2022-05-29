@@ -97,4 +97,6 @@ A partir da implementação utilizada do Double Deep Q-Learning acima para o age
 
 ![Double_Deep_Q_Learning_15](DoubleDeepQLearning/results/lunar_lander_15_DoubleDeepQLearning.jpg)
 
+- ### Resumo dos Resultados
+
 A partir dos resultados acima pode-se verificar que em casos em que os steps foram menores a curva de aprendizagem menteve-se mais estável positivamente, ou seja, em casos de score positivo os melhores resultados saíram de modelos que utilizaram steps menores, isso os torna mais próximo do Deep Q-Learning o qual utiliza apenas uma rede neural, dessa forma, o comportamento do Double Deep Q-Learning não parece ter uma eficiência maior que o Deep Q-Learning para casos de 300 e 500 episódios de treino do modelo.
